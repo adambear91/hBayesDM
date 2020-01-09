@@ -154,16 +154,25 @@ choiceRT_preprocess_func <- function(raw_data, general_info, RTbound = 0.1) {
   Nu <- with(raw_data, aggregate(choice == 2, by = list(y = subjid), FUN = sum)[["x"]])
   Nl <- with(raw_data, aggregate(choice == 1, by = list(y = subjid), FUN = sum)[["x"]])
 
+  # THIS IS WHERE I THINK YOU MIGHT NEED CONDITION VARIABLE
+
   # Reaction times for upper and lower boundary responses
   RTu <- array(-1, c(n_subj, max(Nu)))
   RTl <- array(-1, c(n_subj, max(Nl)))
+
+  # Condition variable for upper and lower boundary responses
+  Cu <- array(-1, c(n_subj, max(Nu)))
+  Cl <- array(-1, c(n_subj, max(Nl)))
+
   for (i in 1:n_subj) {
     subj <- subjs[i]
     subj_data <- subset(raw_data, raw_data$subjid == subj)
 
     if (Nu[i] > 0)
+      Cu[i, 1:Nu[i]] <- subj_data$condition[subj_data$choice == 2]
       RTu[i, 1:Nu[i]] <- subj_data$rt[subj_data$choice == 2]  # (Nu/Nl[i]+1):Nu/Nl_max will be padded with 0's
     if (Nl[i] > 0)
+      Cl[i, 1:Nl[i]] <- subj_data$condition[subj_data$choice == 1]
       RTl[i, 1:Nl[i]] <- subj_data$rt[subj_data$choice == 1]  # 0 padding is skipped in likelihood calculation
   }
 
@@ -179,6 +188,8 @@ choiceRT_preprocess_func <- function(raw_data, general_info, RTbound = 0.1) {
     Nl      = Nl,       # Number of lower boundary responses for each subject
     RTu     = RTu,      # Upper boundary response times
     RTl     = RTl,      # Lower boundary response times
+    Cu      = Cu,       # Upper boundary condition
+    Cl      = Cl,       # Lower boundary condition
     minRT   = minRT,    # Minimum RT for each subject
     RTbound = RTbound   # Lower bound of RT across all subjects (e.g., 0.1 second)
   )

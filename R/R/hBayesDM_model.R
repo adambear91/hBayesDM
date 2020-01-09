@@ -479,6 +479,7 @@ hBayesDM_model <- function(task_name,
                              iter    = niter,
                              warmup  = nwarmup,
                              thin    = nthin,
+                             seed    = 1,
                              control = list(adapt_delta   = adapt_delta,
                                             stepsize      = stepsize,
                                             max_treedepth = max_treedepth))

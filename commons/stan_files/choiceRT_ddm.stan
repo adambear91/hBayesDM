@@ -9,6 +9,8 @@ data {
   int<lower=0> Nl[N];  // Number of lower boundary responses for each subj
   real RTu[N, Nu_max];  // upper boundary response times
   real RTl[N, Nl_max];  // lower boundary response times
+  real Cu[N, Nu_max];   // upper boundary condition
+  real Cl[N, Nl_max];   // lower boundary condition
   real minRT[N];       // minimum RT for each subject of the observed data
   real RTbound;        // lower bound or RT across all subjects (e.g., 0.1 second)
 }
@@ -65,9 +67,13 @@ model {
   // Begin subject loop
   for (i in 1:N) {
     // Response time distributed along wiener first passage time distribution
-    RTu[i, :Nu[i]] ~ wiener(alpha[i], tau[i], beta[i], delta[i]);
-    RTl[i, :Nl[i]] ~ wiener(alpha[i], tau[i], 1-beta[i], -delta[i]);
+    for (j in 1:Nu[i]) {
+      RTu[i, j] ~ wiener(alpha[i], tau[i], Cu[i, j]*beta[i] + (1-Cu[i, j])*(1-beta[i]), delta[i]);
+    }
 
+    for(j in 1:Nl[i]) {
+      RTl[i, j] ~ wiener(alpha[i], tau[i], Cl[i, j]*(1-beta[i]) + (1-Cl[i, j])*beta[i], -delta[i]);
+    }
   } // end of subject loop
 }
 
@@ -90,9 +96,15 @@ generated quantities {
   { // local section, this saves time and space
     // Begin subject loop
     for (i in 1:N) {
-      log_lik[i] = wiener_lpdf(RTu[i, :Nu[i]] | alpha[i], tau[i], beta[i], delta[i]);
-      log_lik[i] += wiener_lpdf(RTl[i, :Nl[i]] | alpha[i], tau[i], 1-beta[i], -delta[i]);
+      log_lik[i] = 0;
+
+      for (j in 1:Nu[i]) {
+        log_lik[i] += wiener_lpdf(RTu[i, j] | alpha[i], tau[i], Cu[i, j]*beta[i] + (1-Cu[i, j])*(1-beta[i]), delta[i]);
+      }
+
+      for (j in 1:Nl[i]) {
+        log_lik[i] += wiener_lpdf(RTl[i, j] | alpha[i], tau[i], Cl[i, j]*(1-beta[i]) + (1-Cl[i, j])*beta[i], -delta[i]);
+      }
     }
   }
 }
-

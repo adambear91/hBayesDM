@@ -45,7 +45,7 @@ License: GPL-3
 LazyData: true
 NeedsCompilation: yes
 Encoding: UTF-8
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 SystemRequirements: GNU make
 Collate:
     'HDIofMCMC.R'
@@ -63,6 +63,7 @@ Collate:
     'bart_par4.R'
     'cgt_cm.R'
     'choiceRT_ddm.R'
+    'choiceRT_ddm_conditional.R'
     'choiceRT_ddm_single.R'
     'choiceRT_lba.R'
     'choiceRT_lba_single.R'
