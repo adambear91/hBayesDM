@@ -56,7 +56,7 @@ transformed parameters {
 model {
   // Hyperparameters
   mu_pr  ~ normal(0, 1);
-  sigma ~ normal(0, .2);
+  sigma ~ normal(0, 0.2);
 
   // Individual parameters for non-centered parameterization
   alpha_pr ~ normal(0, 1);
